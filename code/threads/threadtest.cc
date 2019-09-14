@@ -1,23 +1,12 @@
 #include "kernel.h"
 #include "main.h"
 #include "thread.h"
-
-void
-SimpleThread(int which)
-{
-    int num;
-    
-    for (num = 0; num < 5; num++) {
-        printf("*** thread %d looped %d times\n", which, num);
-        kernel->currentThread->Yield();
-    }
-}
+#include "../userprog/lab2.h"
 
 void
 ThreadTest()
 {
-    Thread *t = new Thread("forked thread");
-    t->Fork((VoidFunctionPtr) SimpleThread, (void *) 1);
-    
-    SimpleThread(0);
+    printf("Lab2 Supermarket\n");
+    Supermarket sm = Supermarket();
+    sm.Run();
 }

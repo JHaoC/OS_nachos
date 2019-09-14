@@ -200,7 +200,7 @@ DEFINES =  -DFILESYS_STUB -DRDATA -DSIM_FIX
 # break the thread system.  You might want to use -fno-inline if
 # you need to call some inline functions from the debugger.
 
-CFLAGS = -g -Wall $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -m32
+CFLAGS = -g -Wall $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -m32 -std=c++11
 LDFLAGS = -m32
 CPP_AS_FLAGS= -m32
 
@@ -286,13 +286,15 @@ THREAD_O = alarm.o kernel.o main.o scheduler.o synch.o thread.o threadtest.o
 USERPROG_H = ../userprog/addrspace.h\
 	../userprog/syscall.h\
 	../userprog/synchconsole.h\
-	../userprog/noff.h
+	../userprog/noff.h\
+	../userprog/lab2.h
 
 USERPROG_C = ../userprog/addrspace.cc\
 	../userprog/exception.cc\
-	../userprog/synchconsole.cc
+	../userprog/synchconsole.cc\
+	../userprog/lab2.cc
 
-USERPROG_O = addrspace.o exception.o synchconsole.o
+USERPROG_O = addrspace.o exception.o synchconsole.o lab2.o
 
 FILESYS_H =../filesys/directory.h \
 	../filesys/filehdr.h\
@@ -342,7 +344,7 @@ switch.o: ../threads/switch.S
 	$(CC) $(CPP_AS_FLAGS) -P $(INCPATH) $(HOSTCFLAGS) -c ../threads/switch.S
 
 depend: $(CFILES) $(HFILES)
-	$(CC) $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -M $(CFILES) > makedep
+	$(CC) $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -std=c++11 -M $(CFILES) > makedep
 	@echo '/^# DO NOT DELETE THIS LINE/+1,$$d' >eddep
 	@echo '$$r makedep' >>eddep
 	@echo 'w' >>eddep

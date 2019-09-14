@@ -33,6 +33,7 @@ ListElement<T>::ListElement(T itm)
 }
 
 
+
 //----------------------------------------------------------------------
 // List<T>::List
 //	Initialize a list, empty to start with.
@@ -329,7 +330,7 @@ List<T>::SelfTest(T *p, int numEntries)
 //      Test whether this is still a legal sorted list.
 //
 //	Test: is the list sorted?
-//----------------------------------------------------------------------
+//------------------------------------------s----------------------------
 
 template <class T>
 void 
