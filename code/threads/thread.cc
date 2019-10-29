@@ -45,6 +45,9 @@ Thread::Thread(char* threadName)
 					// of machine registers
     }
     space = NULL;
+    vRtime = 0;
+    weight = 1;
+    rRtime = 0;
 }
 
 //----------------------------------------------------------------------
@@ -66,6 +69,66 @@ Thread::~Thread()
     ASSERT(this != kernel->currentThread);
     if (stack != NULL)
 	DeallocBoundedArray((char *) stack, StackSize * sizeof(int));
+}
+
+//----------------------------------------------------------------------
+// Thread::GetVRtime();
+//  return VRtime
+//----------------------------------------------------------------------
+
+int Thread::GetVRtime()
+{
+    return vRtime;
+}
+
+//----------------------------------------------------------------------
+// Thread::GetRRtime();
+//  return VRtime
+//----------------------------------------------------------------------
+
+int Thread::GetRRtime()
+{
+    return rRtime;
+}
+
+//----------------------------------------------------------------------
+// Thread::UpdateRRtime(int time);
+// 	Update VRtime add new time to VRtime
+//----------------------------------------------------------------------
+
+void Thread::UpdateRRtime(int time)
+{
+    rRtime = time;
+}
+
+//----------------------------------------------------------------------
+// Thread::UpdateRRtime(int time);
+// 	Update VRtime add new time to VRtime
+//----------------------------------------------------------------------
+
+void Thread::UpdateVRtime(int time)
+{
+    vRtime += time*weight;
+}
+
+//----------------------------------------------------------------------
+// Thread::SetWeight(int num);
+// 	Set weight
+//----------------------------------------------------------------------
+
+void Thread::SetWeight(int num)
+{
+    weight = num;
+}
+
+//----------------------------------------------------------------------
+// Thread::GetWeight();
+// 	return weight
+//----------------------------------------------------------------------
+
+int Thread::GetWeight()
+{
+    return weight; 
 }
 
 //----------------------------------------------------------------------

@@ -80,6 +80,13 @@ class Thread {
     // THEY MUST be in this position for SWITCH to work.
     int *stackTop;			 // the current stack pointer
     void *machineState[MachineStateSize];  // all registers except for stackTop
+    
+    // Virtual running time
+    int vRtime;
+    // weight 1,2,3,4,5. default is 1
+    int weight;
+    // Real Running time 
+    int rRtime;
 
   public:
     Thread(char* debugName);		// initialize a Thread 
@@ -104,6 +111,14 @@ class Thread {
     char* getName() { return (name); }
     void Print() { cout << name; }
     void SelfTest();		// test whether thread impl is working
+    
+    // Set and get VRtime RRtime and Weight
+    void UpdateVRtime(int time);
+    void UpdateRRtime(int time);
+    int GetVRtime();
+    int GetRRtime();
+    void SetWeight(int num);
+    int GetWeight();
 
   private:
     // some of the private data for this class is listed above

@@ -48,8 +48,10 @@ enum MachineStatus {IdleMode, SystemMode, UserMode};
 // IntType records which hardware device generated an interrupt.
 // In Nachos, we support a hardware timer device, a disk, a console
 // display and keyboard, and a network.
+
+// Add new Interrupt type IOInt for Assignment 1 to simulate I/O Interupt
 enum IntType { TimerInt, DiskInt, ConsoleWriteInt, ConsoleReadInt, 
-			NetworkSendInt, NetworkRecvInt};
+			NetworkSendInt, NetworkRecvInt, IOInt};
 
 // The following class defines an interrupt that is scheduled
 // to occur in the future.  The internal data structures are

@@ -227,16 +227,18 @@ LIB_H = ../lib/bitmap.h\
 	../lib/libtest.h\
 	../lib/list.h\
 	../lib/sysdep.h\
-	../lib/utility.h
+	../lib/utility.h\
+	../lib/redblacktree.h\
 
 LIB_C = ../lib/bitmap.cc\
 	../lib/debug.cc\
 	../lib/hash.cc\
 	../lib/libtest.cc\
 	../lib/list.cc\
-	../lib/sysdep.cc
+	../lib/sysdep.cc\
+	../lib/redblacktree.cc
 
-LIB_O = bitmap.o debug.o libtest.o sysdep.o
+LIB_O = bitmap.o debug.o libtest.o sysdep.o 
 
 
 MACHINE_H = ../machine/callback.h\
@@ -270,7 +272,8 @@ THREAD_H = ../threads/alarm.h\
 	../threads/switch.h\
 	../threads/synch.h\
 	../threads/synchlist.h\
-	../threads/thread.h
+	../threads/thread.h\
+	../threads/iorequest.h
 
 THREAD_C = ../threads/alarm.cc\
 	../threads/kernel.cc\
@@ -279,9 +282,10 @@ THREAD_C = ../threads/alarm.cc\
 	../threads/synch.cc\
 	../threads/synchlist.cc\
 	../threads/thread.cc\
-	../threads/threadtest.cc
+	../threads/threadtest.cc\
+	../threads/iorequest.cc
 
-THREAD_O = alarm.o kernel.o main.o scheduler.o synch.o thread.o threadtest.o
+THREAD_O = alarm.o kernel.o main.o scheduler.o synch.o thread.o iorequest.o threadtest.o 
 
 USERPROG_H = ../userprog/addrspace.h\
 	../userprog/syscall.h\

@@ -6,7 +6,8 @@
         {
             "label": "build nachos",
             "type": "shell",
-            "command": "cd build.linux&&make clean&&make nachos"
+            "command": "cd build.linux&&make clean&&make nachos",
+            "problemMatcher": []
         },
         {
             "label": "clean nachos",
