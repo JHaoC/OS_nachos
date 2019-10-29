@@ -14,7 +14,11 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
+<<<<<<< HEAD
             "externalConsole": false,
+=======
+            "externalConsole": true,
+>>>>>>> assignmentFirst
             "MIMode": "gdb",
             "setupCommands": [
                 {

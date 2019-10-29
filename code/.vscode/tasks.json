@@ -6,7 +6,12 @@
         {
             "label": "build nachos",
             "type": "shell",
+<<<<<<< HEAD
             "command": "cd build.linux&&make clean&&make nachos"
+=======
+            "command": "cd build.linux&&make clean&&make nachos",
+            "problemMatcher": []
+>>>>>>> assignmentFirst
         },
         {
             "label": "clean nachos",

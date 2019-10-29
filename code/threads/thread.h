@@ -77,6 +77,7 @@ enum ThreadStatus
 //  Some threads also belong to a user address space; threads
 //  that only run in the kernel have a NULL address space.
 
+<<<<<<< HEAD
 class Thread
 {
 private:
@@ -133,6 +134,78 @@ public:
   void RestoreUserState(); // restore user-level register state
 
   AddrSpace *space; // User code this thread is running.
+=======
+class Thread {
+  private:
+    // NOTE: DO NOT CHANGE the order of these first two members.
+    // THEY MUST be in this position for SWITCH to work.
+    int *stackTop;			 // the current stack pointer
+    void *machineState[MachineStateSize];  // all registers except for stackTop
+    
+    // Virtual running time
+    int vRtime;
+    // weight 1,2,3,4,5. default is 1
+    int weight;
+    // Real Running time 
+    int rRtime;
+
+  public:
+    Thread(char* debugName);		// initialize a Thread 
+    ~Thread(); 				// deallocate a Thread
+					// NOTE -- thread being deleted
+					// must not be running when delete 
+					// is called
+
+    // basic thread operations
+
+    void Fork(VoidFunctionPtr func, void *arg); 
+    				// Make thread run (*func)(arg)
+    void Yield();  		// Relinquish the CPU if any 
+				// other thread is runnable
+    void Sleep(bool finishing); // Put the thread to sleep and 
+				// relinquish the processor
+    void Begin();		// Startup code for the thread	
+    void Finish();  		// The thread is done executing
+    
+    void CheckOverflow();   	// Check if thread stack has overflowed
+    void setStatus(ThreadStatus st) { status = st; }
+    char* getName() { return (name); }
+    void Print() { cout << name; }
+    void SelfTest();		// test whether thread impl is working
+    
+    // Set and get VRtime RRtime and Weight
+    void UpdateVRtime(int time);
+    void UpdateRRtime(int time);
+    int GetVRtime();
+    int GetRRtime();
+    void SetWeight(int num);
+    int GetWeight();
+
+  private:
+    // some of the private data for this class is listed above
+    
+    int *stack; 	 	// Bottom of the stack 
+				// NULL if this is the main thread
+				// (If NULL, don't deallocate stack)
+    ThreadStatus status;	// ready, running or blocked
+    char* name;
+
+    void StackAllocate(VoidFunctionPtr func, void *arg);
+    				// Allocate a stack for thread.
+				// Used internally by Fork()
+
+// A thread running a user program actually has *two* sets of CPU registers -- 
+// one for its state while executing user code, one for its state 
+// while executing kernel code.
+
+    int userRegisters[NumTotalRegs];	// user-level CPU register state
+
+  public:
+    void SaveUserState();		// save user-level register state
+    void RestoreUserState();		// restore user-level register state
+
+    AddrSpace *space;			// User code this thread is running.
+>>>>>>> assignmentFirst
 };
 
 // external function, dummy routine whose sole job is to call Thread::Print

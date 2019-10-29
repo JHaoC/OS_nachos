@@ -1,3 +1,7 @@
 # Don't track content of these folders
 .DS_Store/
+<<<<<<< HEAD
 code/.DS_Store/
+=======
+code/.DS_Store/
+>>>>>>> assignmentFirst

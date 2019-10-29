@@ -23,6 +23,7 @@
 Alarm::Alarm(bool doRandom)
 {
     timer = new Timer(doRandom, this);
+    counter = 0;
 }
 
 //----------------------------------------------------------------------
@@ -50,6 +51,16 @@ Alarm::CallBack()
     MachineStatus status = interrupt->getStatus();
     
     if (status != IdleMode) {
-	interrupt->YieldOnReturn();
+        if(kernel->currentThread->GetRRtime()/100 > counter)
+        {
+           counter++; 
+        }
+        else
+        {
+            printf("Time Interrupt\n\n");
+            interrupt->YieldOnReturn();
+            counter = 0;
+        }
+	
     }
 }
