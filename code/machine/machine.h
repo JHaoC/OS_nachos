@@ -53,7 +53,8 @@ enum ExceptionType { NoException,           // Everything ok!
 		     OverflowException,     // Integer overflow in add or sub.
 		     IllegalInstrException, // Unimplemented or reserved instr.
 		     
-		     NumExceptionTypes
+		     NumExceptionTypes,
+			 TLBMissException // for TLB Miss
 };
 
 // User program CPU state.  The full set of MIPS registers, plus a few
@@ -134,6 +135,8 @@ class Machine {
 
     TranslationEntry *tlb;		// this pointer should be considered 
 					// "read-only" to Nachos kernel code
+
+	int tlbCounter; // tlb to point tlb position
 
     TranslationEntry *pageTable;
     unsigned int pageTableSize;

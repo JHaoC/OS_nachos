@@ -6,7 +6,10 @@
         {
             "label": "build nachos",
             "type": "shell",
-            "command": "cd build.linux&&make clean&&make nachos"
+            "command": "cd build.linux&&make clean&&make nachos",
+            "problemMatcher": [
+                "$tsc"
+            ]
         },
         {
             "label": "clean nachos",
@@ -31,7 +34,7 @@
         {
             "label": "run nachos",
             "type": "shell",
-            "command": "build.linux/nachos -K",
+            "command": "build.linux/nachos -Q 5000 -x test/task1 -x test/test2 -x test/sort -x test/matmult",
             "problemMatcher": []
         }
     ]

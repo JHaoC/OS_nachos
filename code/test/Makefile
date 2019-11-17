@@ -112,7 +112,7 @@ ifeq ($(hosttype),unknown)
 PROGRAMS = unknownhost
 else
 # change this if you create a new test program!
-PROGRAMS = add halt shell matmult sort segments
+PROGRAMS = add halt shell matmult sort segments task1 helpTest test1 test2 test3
 endif
 
 all: $(PROGRAMS)
@@ -163,6 +163,36 @@ clean:
 
 distclean: clean
 	$(RM) -f $(PROGRAMS)
+
+task1.o: task1.c
+	$(CC) $(CFLAGS) -c task1.c
+task1: task1.o start.o
+	$(LD) $(LDFLAGS) start.o task1.o -o task1.coff
+	$(COFF2NOFF) task1.coff task1
+
+helpTest.o: helpTest.c
+	$(CC) $(CFLAGS) -c helpTest.c
+helpTest: helpTest.o start.o
+	$(LD) $(LDFLAGS) start.o helpTest.o -o helpTest.coff
+	$(COFF2NOFF) helpTest.coff helpTest
+
+test1.o: test1.c
+	$(CC) $(CFLAGS) -c test1.c
+test1: test1.o start.o
+	$(LD) $(LDFLAGS) start.o test1.o -o test1.coff
+	$(COFF2NOFF) test1.coff test1
+
+test2.o: test2.c
+	$(CC) $(CFLAGS) -c test2.c
+test2: test2.o start.o
+	$(LD) $(LDFLAGS) start.o test2.o -o test2.coff
+	$(COFF2NOFF) test2.coff test2
+
+test3.o: test3.c
+	$(CC) $(CFLAGS) -c test3.c
+test3: test3.o start.o
+	$(LD) $(LDFLAGS) start.o test3.o -o test3.coff
+	$(COFF2NOFF) test3.coff test3
 
 unknownhost:
 	@echo Host type could not be determined.

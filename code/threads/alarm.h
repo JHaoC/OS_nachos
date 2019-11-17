@@ -28,13 +28,13 @@ class Alarm : public CallBackObj {
     Alarm(bool doRandomYield);	// Initialize the timer, and callback 
 				// to "toCall" every time slice.
     ~Alarm() { delete timer; }
-    
+
     void WaitUntil(int x);	// suspend execution until time > now + x
                                 // this method is not yet implemented
 
   private:
     Timer *timer;		// the hardware timer device
-
+    
     void CallBack();		// called when the hardware
 				// timer generates an interrupt
 };

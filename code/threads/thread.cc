@@ -35,7 +35,24 @@ const int STACK_FENCEPOST = 0xdedbeef;
 
 Thread::Thread(char* threadName)
 {
-    name = threadName;
+    char* t = threadName;
+    int size = 0;
+    while(true)
+    {
+        size++;
+        if(*t == '\0')
+        {
+            break;
+        }
+        t++;
+        //size++;
+    }
+    
+    name = new char[size];
+    for(int i = 0; i <size; i++)
+    {
+        name[i] = threadName[i];
+    }
     stackTop = NULL;
     stack = NULL;
     status = JUST_CREATED;
@@ -45,6 +62,8 @@ Thread::Thread(char* threadName)
 					// of machine registers
     }
     space = NULL;
+    threadID = kernel->numofThread;
+    kernel->numofThread++;
 }
 
 //----------------------------------------------------------------------
@@ -66,6 +85,15 @@ Thread::~Thread()
     ASSERT(this != kernel->currentThread);
     if (stack != NULL)
 	DeallocBoundedArray((char *) stack, StackSize * sizeof(int));
+    if (space != NULL)
+    {
+        delete space;
+    }
+    if (name != NULL)
+    {
+        delete [] name;
+    }
+    
 }
 
 //----------------------------------------------------------------------

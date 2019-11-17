@@ -48,6 +48,7 @@ class Timer : public CallBackObj {
     void SetInterrupt();  	// cause an interrupt to occur in the
     				// the future after a fixed or random
 				// delay
+
 };
 
 #endif // TIMER_H

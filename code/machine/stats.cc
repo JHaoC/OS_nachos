@@ -40,6 +40,7 @@ Statistics::Print()
 		cout << "Console I/O: reads " << numConsoleCharsRead;
     cout << ", writes " << numConsoleCharsWritten << "\n";
     cout << "Paging: faults " << numPageFaults << "\n";
+    //cout << "TLB: faults " << numTLBMiss << "\n";
     cout << "Network I/O: packets received " << numPacketsRecvd;
 		cout << ", sent " << numPacketsSent << "\n";
 }

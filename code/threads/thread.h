@@ -104,6 +104,7 @@ class Thread {
     char* getName() { return (name); }
     void Print() { cout << name; }
     void SelfTest();		// test whether thread impl is working
+    void SetUserRegister(int i, int value){ userRegisters[i] = value;}
 
   private:
     // some of the private data for this class is listed above
@@ -127,7 +128,7 @@ class Thread {
   public:
     void SaveUserState();		// save user-level register state
     void RestoreUserState();		// restore user-level register state
-
+    int threadID;
     AddrSpace *space;			// User code this thread is running.
 };
 
