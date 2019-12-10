@@ -2,11 +2,19 @@
 
 int main()
 {
+    OpenFileId a;
     int i;
-    for ( i = 0; i < 10; i++)
+    i = 20;
+    while(i!=0)
     {
-        Write("test 2: Help test for Task 2", 29, 0);
+        a = Open("TestFile",1);
+        if(a != -1)
+        {
+            Close(a);
+            Remove("TestFile");
+            break;
+        }
+        i--;
     }
-    Write("test 2: finish 10 rounds", 25, 0);
     Exit(0);
 }

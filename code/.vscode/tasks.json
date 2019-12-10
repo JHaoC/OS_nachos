@@ -29,7 +29,8 @@
         {
             "label": "clean usrprog",
             "type": "shell",
-            "command": "cd test&&make clean&&make distclean"
+            "command": "cd test&&make clean&&make distclean",
+            "problemMatcher": []
         },
         {
             "label": "run nachos",

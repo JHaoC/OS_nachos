@@ -132,7 +132,7 @@ AddrSpace::~AddrSpace()
 
 bool AddrSpace::Load(char *fileName)
 {
-    OpenFile *executable = kernel->fileSystem->Open(fileName);
+    OpenFile *executable = kernel->fileSystem->Open(fileName,2);
     NoffHeader noffH;
     unsigned int size;
 
@@ -222,8 +222,10 @@ bool AddrSpace::Load(char *fileName)
 
             // load file into swapspace
             executable->ReadAt(buffer, PageSize, noffH.code.inFileAddr + (i * PageSize));
+            //kernel->swapspace->Seek(pageTable[i].virtualPage * PageSize);
+            //kernel->swapspace->Write(buffer,PageSize);
+            
             kernel->swapspace->WriteAt(buffer, PageSize, pageTable[i].virtualPage * PageSize);
-
             kernel->swapCounter++;
         }
 

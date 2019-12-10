@@ -40,7 +40,8 @@
 #include "copyright.h"
 #include "utility.h"
 #include "sysdep.h"
-
+#include "../filesys/filetable.h"
+#include "list.h"
 #include "machine.h"
 #include "addrspace.h"
 
@@ -101,10 +102,25 @@ class Thread {
     
     void CheckOverflow();   	// Check if thread stack has overflowed
     void setStatus(ThreadStatus st) { status = st; }
+    ThreadStatus GetStatus(){return status;}
     char* getName() { return (name); }
     void Print() { cout << name; }
     void SelfTest();		// test whether thread impl is working
     void SetUserRegister(int i, int value){ userRegisters[i] = value;}
+    
+    // Assignment 3
+    // Task1
+    OpenFile* GetFile(OpenFileId id);
+
+    // Task2
+    void SetParentThread(Thread* parent){ parentThread = parent;}
+    Thread* GetParentThread() {return parentThread;}
+    Thread* GetWaitingThread() {return waitingchild;}
+    void SetWaitingChild(Thread* child){ waitingchild = child;}
+
+    void AddChild( Thread* child);
+    void RemoveChild(Thread* child);
+    bool IsExitedChild(Thread* child){ return !children->IsInList(child);}
 
   private:
     // some of the private data for this class is listed above
@@ -118,6 +134,12 @@ class Thread {
     void StackAllocate(VoidFunctionPtr func, void *arg);
     				// Allocate a stack for thread.
 				// Used internally by Fork()
+    Thread *parentThread;
+    List<Thread*> *children;
+    Thread *waitingchild;
+
+
+   
 
 // A thread running a user program actually has *two* sets of CPU registers -- 
 // one for its state while executing user code, one for its state 
@@ -130,6 +152,9 @@ class Thread {
     void RestoreUserState();		// restore user-level register state
     int threadID;
     AddrSpace *space;			// User code this thread is running.
+
+    // Assigment 3 for file table
+    OpenFileTable *openFileTable;
 };
 
 // external function, dummy routine whose sole job is to call Thread::Print

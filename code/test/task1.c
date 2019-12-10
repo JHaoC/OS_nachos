@@ -10,32 +10,28 @@ void HelpforFork()
 int
 main()
 {
-  //buffer helping for read system call
   char buffer[100];
-  
-  //Check write system call
-  Write("Test for write system call!", 28, 0);
+  OpenFileId a;
+  OpenFileId b;
+  //OpenFileId c;
 
-  //Check read system call
-  //There is secret words"This is a test for read system call for the assignment 2.";
-  //Read() can read it and partial or entire depending on the size into buffer 
-  
-  //the size is less than words
-  Read(buffer,4,1);
-  Write(buffer,4,0);
-  // the size larger than words
-  Read(buffer,65,1);
-  Write(buffer,65,0);
-  
-  //Check fork system
-  Write("Checking for fork system",25,0);
-  ThreadFork((void*)HelpforFork);
+  Write("Task1 start!!\n",15,ConsoleOutputId);
+  a = Open("TestFile", 2);
+  Write("Test for for reading and writing system call\n",46,a);
 
-  // Check exec system call to execute test1, test2 and helpTest
-  // In the helpTest there is halt() in the end which shows all stats
-  // for TLB missing and page fault
-  Exec("../test/test1");
-  Exec("../test/helpTest"); 
+  Create("TestFile", 6);
+  a = Open("TestFile", 2);
+  b = Open("TestFile", 2);
+  
+  Write("Test for for reading and writing system call\n",46,a);
+  Read(buffer, 46,a);
+  Write(buffer, 46, ConsoleOutputId);
+
+  Close(a);
+  Close(b);
+  //Remove("TestFile");
+  //c = Open("TestFile", 2);
+ 
+  
   Exit(0);
-  /* not reached */
 }

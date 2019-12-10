@@ -19,12 +19,16 @@
 #include "filesys.h"
 #include "machine.h"
 #include "bitmap.h"
+#include "synchconsole.h"
+#include "../filesys/filetable.h"
 
 class PostOfficeInput;
 class PostOfficeOutput;
 class SynchConsoleInput;
 class SynchConsoleOutput;
 class SynchDisk;
+class Lock;
+class Openfile;
 
 class Kernel
 {
@@ -59,18 +63,29 @@ public:
     PostOfficeInput *postOfficeIn;
     PostOfficeOutput *postOfficeOut;
 
+    // Assignment 2
     int quantum; // design for quantum, default as TimeTicker
-
     OpenFile *swapspace; // swap space to increase memory
     int swapCounter;
     List<TranslationEntry *> *PageContainer;
     Bitmap *freeMap;
-
     int numofThread = 0; // for TLB
-
     int hostName; // machine identifier
-
     bool randomselect = FALSE;
+
+    // Assignment 3
+#ifndef FILESYS_STUB
+    Lock *io_lock; // force i/o as atomic
+    Lock *directoryFile_lock; // lock for directoryFile in filesystem 
+    Lock *freeMapFile_lock; // lock for freeMapFile in filesytem
+
+    FileEntryTable *globalFileTable; // for kernel openfiletable
+    OpenFile *freeMapFile;   // Bit map of free disk blocks,
+							 // represented as a file
+	OpenFile *directoryFile; // "Root" directory -- list of
+
+    Thread** threadTable;
+#endif
     
 
 private:

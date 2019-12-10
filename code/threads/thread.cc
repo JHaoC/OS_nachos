@@ -21,6 +21,10 @@
 #include "switch.h"
 #include "synch.h"
 #include "sysdep.h"
+#include "main.h"
+#include "../filesys/filetable.h"
+#include "list.h"
+
 
 // this is put at the top of the execution stack, for detecting stack overflows
 const int STACK_FENCEPOST = 0xdedbeef;
@@ -62,8 +66,13 @@ Thread::Thread(char* threadName)
 					// of machine registers
     }
     space = NULL;
+    openFileTable = new OpenFileTable();
     threadID = kernel->numofThread;
     kernel->numofThread++;
+    parentThread = NULL;
+    children = new List<Thread*>();
+    waitingchild = NULL;
+
 }
 
 //----------------------------------------------------------------------
@@ -93,6 +102,16 @@ Thread::~Thread()
     {
         delete [] name;
     }
+    if (openFileTable != NULL)
+    {
+        delete openFileTable;
+    }
+    parentThread = NULL;
+    waitingchild = NULL;
+    // while(!children->IsEmpty())
+    // {
+    //     children->RemoveFront()->SetParentThread(NULL);
+    // }
     
 }
 
@@ -462,3 +481,35 @@ Thread::SelfTest()
     SimpleThread(0);
 }
 
+
+//----------------------------------------------------------------------
+// Thread::GetFile(OpenFileId id)
+// 	from the file id to return openfile
+//----------------------------------------------------------------------
+
+OpenFile* 
+Thread::GetFile(OpenFileId id)
+{
+    ASSERT(this == kernel->currentThread);
+    DEBUG(dbgThread, "Beginning thread: " << name);
+    
+    return openFileTable->Resolve(id);
+}
+
+void 
+Thread::AddChild(Thread* child)
+{
+    if(children->IsInList(child))
+    {
+        children->Append(child);
+    }
+}
+
+void 
+Thread::RemoveChild(Thread* child)
+{
+    if(children->IsInList(child))
+    {
+        children->Remove(child);
+    }
+}

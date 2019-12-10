@@ -8,14 +8,15 @@
 #include "copyright.h"
 #include "debug.h"
 #include "main.h"
+#include "synch.h"
 #include "kernel.h"
 #include "sysdep.h"
-#include "synch.h"
 #include "synchlist.h"
 #include "libtest.h"
 #include "string.h"
 #include "synchconsole.h"
 #include "synchdisk.h"
+#include "filetable.h"
 #include "post.h"
 
 //----------------------------------------------------------------------
@@ -119,6 +120,11 @@ void Kernel::Initialize(int quantum)
     // set for quantum
     this->quantum = quantum;
 
+    // Global file table setting up
+    globalFileTable = new FileEntryTable();
+    //globalFileTable->InsertEntry(NULL); // for ConsoleIn
+    //globalFileTable->InsertEntry(NULL); //for ConsoleOur
+
     currentThread = new Thread("main");
     currentThread->setStatus(RUNNING);
 
@@ -130,6 +136,15 @@ void Kernel::Initialize(int quantum)
     synchConsoleIn = new SynchConsoleInput(consoleIn);    // input from stdin
     synchConsoleOut = new SynchConsoleOutput(consoleOut); // output to stdout
     synchDisk = new SynchDisk();
+    io_lock = new Lock("atomic_io_lock");
+    directoryFile_lock = new Lock("directoryFile_lock");
+    freeMapFile_lock = new Lock("freeMapFile_lock");
+    threadTable = new Thread*[40]; // Max_thread can have for userprog
+    for(int i = 0; i < 40; i++)
+    {
+        threadTable[i] = NULL;
+    }
+    
 
 #ifdef FILESYS_STUB
     fileSystem = new FileSystem();
@@ -142,6 +157,12 @@ void Kernel::Initialize(int quantum)
 
 #else
     fileSystem = new FileSystem(formatFlag);
+    // create a new file as swap
+    if((swapspace=fileSystem->Open("swapspace",2))==NULL)
+    {
+        fileSystem->Create("swapspace", 0, 6);
+        swapspace = fileSystem->Open("swapspace",2);
+    }
 #endif // FILESYS_STUB
     //postOfficeIn = new PostOfficeInput(10);
     //postOfficeOut = new PostOfficeOutput(reliability);
@@ -174,7 +195,11 @@ Kernel::~Kernel()
     delete swapspace;
     delete freeMap;
     delete PageContainer;
-
+    delete io_lock;
+    delete directoryFile_lock;
+    delete freeMapFile_lock;
+    delete globalFileTable;
+    delete threadTable;
     Exit(0);
 }
 

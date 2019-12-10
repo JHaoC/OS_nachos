@@ -35,6 +35,7 @@
 #include "copyright.h"
 #include "synch.h"
 #include "main.h"
+#include "thread.h"
 
 //----------------------------------------------------------------------
 // Semaphore::Semaphore
@@ -200,6 +201,12 @@ void Lock::Release()
     ASSERT(IsHeldByCurrentThread());
     lockHolder = NULL;
     semaphore->V();
+}
+
+
+bool Lock::IsHeldByCurrentThread() 
+{ 
+    return lockHolder == kernel->currentThread; 
 }
 
 //----------------------------------------------------------------------

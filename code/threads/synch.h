@@ -18,9 +18,9 @@
 #define SYNCH_H
 
 #include "copyright.h"
-#include "thread.h"
+//#include "thread.h"
 #include "list.h"
-#include "main.h"
+//#include "main.h"
 
 // The following class defines a "semaphore" whose value is a non-negative
 // integer.  The semaphore has only two operations P() and V():
@@ -36,6 +36,8 @@
 // into a register, a context switch might have occurred,
 // and some other thread might have called P or V, so the true value might
 // now be different.
+
+class Thread;
 
 class Semaphore {
   public:
@@ -75,8 +77,9 @@ class Lock {
     void Acquire(); 		// these are the only operations on a lock
     void Release(); 		// they are both *atomic*
 
-    bool IsHeldByCurrentThread() { 
-    		return lockHolder == kernel->currentThread; }
+    bool IsHeldByCurrentThread();
+    //  { 
+    // 		return lockHolder == kernel->currentThread; }
     				// return true if the current thread 
 				// holds this lock.
     

@@ -78,10 +78,10 @@ public:
 							 // the disk, so initialize the directory
 							 // and the bitmap of free blocks.
 
-	bool Create(char *name, int initialSize);
+	bool Create(char *name, int initialSize, int protection);
 	// Create a file (UNIX creat)
 
-	OpenFile *Open(char *name); // Open a file (UNIX open)
+	OpenFile *Open(char *name, int mode); // Open a file (UNIX open)
 
 	bool Remove(char *name); // Delete a file (UNIX unlink)
 
@@ -89,10 +89,11 @@ public:
 
 	void Print(); // List all the files and their contents
 
-private:
-	OpenFile *freeMapFile;   // Bit map of free disk blocks,
+	//bool clear(int sector);
+
+	//OpenFile *freeMapFile;   // Bit map of free disk blocks,
 							 // represented as a file
-	OpenFile *directoryFile; // "Root" directory -- list of
+	//OpenFile *directoryFile; // "Root" directory -- list of
 							 // file names, represented as a file
 };
 

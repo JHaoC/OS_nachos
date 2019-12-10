@@ -23,6 +23,7 @@
 #include "copyright.h"
 #include "utility.h"
 #include "sysdep.h"
+#include "filehdr.h"
 
 #ifdef FILESYS_STUB			// Temporarily implement calls to 
 					// Nachos file system as calls to UNIX!
@@ -31,7 +32,6 @@ class OpenFile {
   public:
     OpenFile(int f) { file = f; currentOffset = 0; }	// open the file
     ~OpenFile() { Close(file); }			// close the file
-
     int ReadAt(char *into, int numBytes, int position) { 
     		Lseek(file, position, 0); 
 		return ReadPartial(file, into, numBytes); 
@@ -67,7 +67,7 @@ class OpenFile {
     OpenFile(int sector);		// Open a file whose header is located
 					// at "sector" on the disk
     ~OpenFile();			// Close the file
-
+	OpenFile(const OpenFile &f);
     void Seek(int position); 		// Set the position from which to 
 					// start reading/writing -- UNIX lseek
 
@@ -75,7 +75,9 @@ class OpenFile {
 					// starting at the implicit position.
 					// Return the # actually read/written,
 					// and increment position in file.
+	
     int Write(char *from, int numBytes);
+	//int WriteWithPosition(char *from, int numBytes, int position) //method for swapspace
 
     int ReadAt(char *into, int numBytes, int position);
     					// Read/write bytes from the file,
@@ -86,10 +88,20 @@ class OpenFile {
 					// file (this interface is simpler 
 					// than the UNIX idiom -- lseek to 
 					// end of file, tell, lseek back 
+	
+	bool IsReadable(){ return hdr->isReadable;}
+	bool IsWriteable(){return hdr->isWriteable;}
+	bool IsExecuteable(){return hdr->isExcutable;}
+	bool IsRemoved(){return hdr->isRemoved;}
+	void SetRemove(){hdr->isRemoved = TRUE;}
+	int GetOpenFileID(){return openfileId;}
+
+
     
   private:
     FileHeader *hdr;			// Header for this file 
     int seekPosition;			// Current position within the file
+	int openfileId;
 };
 
 #endif // FILESYS

@@ -149,7 +149,7 @@ void Scheduler::Run(Thread *nextThread, bool finishing)
     CheckToBeDestroyed(); // check if thread we were running
                           // before this one has finished
                           // and needs to be cleaned up
-
+    
     if (oldThread->space != NULL)
     {                                  // if there is an address space
         oldThread->RestoreUserState(); // to restore, do it.
@@ -176,6 +176,17 @@ void Scheduler::CheckToBeDestroyed()
                 kernel->freeMap->Clear(item->Item()->physicalPage); // clear corresponding bit
             }
         }
+
+        // // check  TLB no not
+        // for(int i = 0; i < TLBSize; i++)
+        // {
+        //     if(kernel->machine->tlb[i].threadID == toBeDestroyed->threadID)
+        //     {
+        //         kernel->machine->tlb[i].valid = FALSE;
+        //         kernel->machine->tlb[i].physicalPage = -1;
+        //         break;
+        //     }
+        // }
 
         // space will delete by destructor of thread
         delete toBeDestroyed;

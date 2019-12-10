@@ -54,6 +54,8 @@ void ExceptionHandler(ExceptionType which)
 
 	DEBUG(dbgSys, "Received Exception " << which << " type: " << type << "\n");
 
+	//std::cout<< "Type: "<< type<< std::endl;
+
 	if (which == SyscallException)
 	{
 
@@ -104,7 +106,8 @@ void ExceptionHandler(ExceptionType which)
 			/* Process SysRead Systemcall*/
 			int result;
 			result = SysRead(/* int op1 */ (int)kernel->machine->ReadRegister(4),
-							/* int op2 */ (int)kernel->machine->ReadRegister(5));
+							/* int op2 */ (int)kernel->machine->ReadRegister(5),
+							(int)kernel->machine->ReadRegister(6));
 
 			DEBUG(dbgSys, "Read returning num of bytes actually read with " << result << "\n");
 			/* Prepare Result */
@@ -127,16 +130,79 @@ void ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
 
 		}
+		/* Create systemcall*/
+		else if (type == SC_Create)
+		{
+			/* code */
+			DEBUG(dbgSys, "Create empty file" << kernel->machine->ReadRegister(4) << "protection: " << kernel->machine->ReadRegister(5) << "\n");
+
+			/* Process SysCreate Systemcall*/
+			int result;
+			result = SysCreate(kernel->machine->ReadRegister(4), kernel->machine->ReadRegister(5));
+			DEBUG(dbgSys, "Success return 1 otherwise -1, the result: " << result << "\n");
+			/* Prepare Result */
+			kernel->machine->WriteRegister(2, (int)result);
+
+			/* Modify return point */
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+
+			return;
+
+			ASSERTNOTREACHED();
+		}
+
+		/* Remove systemcall*/
+		else if (type == SC_Remove)
+		{
+			int result;
+			result = SysRemove(kernel->machine->ReadRegister(4));
+			DEBUG(dbgSys, "Success return 1 otherwise -1, the result: " << result << "\n");
+			kernel->machine->WriteRegister(2, (int)result);
+
+			/* Modify return point */
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			return;
+			ASSERTNOTREACHED();
+		}
+
+		/* Open systemcall*/
+		else if (type == SC_Open)
+		{
+			int result;
+			result = (int)SysOpen(kernel->machine->ReadRegister(4), kernel->machine->ReadRegister(5));
+			DEBUG(dbgSys, "Success return openfileID otherwise -1, the result: " << result << "\n");
+			std::cout<< "Open result is "<< result <<std::endl;
+			kernel->machine->WriteRegister(2, (int)result);
+			/* Modify return point */
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			return;
+			ASSERTNOTREACHED();
+		}
 
 		/* Write systemcall*/
 		else if (type == SC_Write)
 		{
 			/* code */
-			DEBUG(dbgSys, "Write buffer into console" << kernel->machine->ReadRegister(4) << " total size is " << kernel->machine->ReadRegister(5) << "\n");
+			DEBUG(dbgSys, "Write buffer into console" << kernel->machine->ReadRegister(4) << " total size is " << kernel->machine->ReadRegister(5) <<" on OpenFileID "<< kernel->machine->ReadRegister(6)<<"\n");
 
 			/* Process SysWrite Systemcall*/
 			int result;
-			result = SysWrite(kernel->machine->ReadRegister(4), kernel->machine->ReadRegister(5));
+			result = SysWrite(kernel->machine->ReadRegister(4), kernel->machine->ReadRegister(5), kernel->machine->ReadRegister(6));
 			DEBUG(dbgSys, "Read returning num of bytes actually read with " << result << "\n");
 			/* Prepare Result */
 			kernel->machine->WriteRegister(2, (int)result);
@@ -151,6 +217,42 @@ void ExceptionHandler(ExceptionType which)
 
 			return;
 
+			ASSERTNOTREACHED();
+		}
+
+		/* Seek systemcall*/
+		else if (type == SC_Seek)
+		{
+			int result;
+			result = SysSeek(kernel->machine->ReadRegister(4), kernel->machine->ReadRegister(5));
+			DEBUG(dbgSys, "Success return 1 otherwise -1, the result: " << result << "\n");
+			kernel->machine->WriteRegister(2, (int)result);
+			/* Modify return point */
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			return;
+			ASSERTNOTREACHED();
+		}
+
+		/* Open systemcall*/
+		else if (type == SC_Close)
+		{
+			int result;
+			result = SysClose(kernel->machine->ReadRegister(4));
+			DEBUG(dbgSys, "Success return 1 otherwise -1, the result: " << result << "\n");
+			kernel->machine->WriteRegister(2, (int)result);
+			/* Modify return point */
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			return;
 			ASSERTNOTREACHED();
 		}
 
@@ -212,6 +314,29 @@ void ExceptionHandler(ExceptionType which)
 			/* Process Sysexev Systemcall*/
 			SpaceId res = SysExec(kernel->machine->ReadRegister(4));
 			DEBUG(dbgSys, "Exec" << res<< "\n");
+			/* Modify return point */
+			kernel->machine->WriteRegister(2, (int)res);
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+
+			return;
+
+			ASSERTNOTREACHED();
+		}
+
+		/* Join systemcall*/
+		else if (type == SC_Join)
+		{
+			/* code */
+			DEBUG(dbgSys, "Join" << kernel->machine->ReadRegister(4) << "\n");
+
+			/* Process Sysexev Systemcall*/
+			int res = SysJoin(kernel->machine->ReadRegister(4));
+			DEBUG(dbgSys, "Join" << res<< "\n");
 			/* Modify return point */
 			kernel->machine->WriteRegister(2, (int)res);
 			/* set previous programm counter (debugging only)*/
