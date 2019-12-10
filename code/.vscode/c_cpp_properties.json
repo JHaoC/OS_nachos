@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**"
             ],
-            "defines": ["FILESYS_STUB", "RDATA", "SIM_FIX"],
+            "defines": ["RDATA", "SIM_FIX"],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++11",

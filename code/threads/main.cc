@@ -21,6 +21,7 @@
 //    -K run a simple self test of kernel threads and synchronization
 //    -C run an interactive console test
 //    -N run a two-machine network test (see Kernel::NetworkTest)
+//    -Q setting quantum for round-robin
 //
 //    Filesystem-related flags:
 //    -f forces the Nachos disk to be formatted
@@ -99,14 +100,22 @@ Copy(char *from, char *to)
 
     // Create a Nachos file of the same length
     DEBUG('f', "Copying file " << from << " of size " << fileLength << " to file " << to);
+<<<<<<< HEAD
     if (!kernel->fileSystem->Create(to, fileLength))
+=======
+    if (!kernel->fileSystem->Create(to, fileLength,7))
+>>>>>>> assignmentThird
     { // Create Nachos file
         printf("Copy: couldn't create output file %s\n", to);
         Close(fd);
         return;
     }
 
+<<<<<<< HEAD
     openFile = kernel->fileSystem->Open(to);
+=======
+    openFile = kernel->fileSystem->Open(to,2);
+>>>>>>> assignmentThird
     ASSERT(openFile != NULL);
 
     // Copy the data in TransferSize chunks
@@ -133,7 +142,11 @@ void Print(char *name)
     int i, amountRead;
     char *buffer;
 
+<<<<<<< HEAD
     if ((openFile = kernel->fileSystem->Open(name)) == NULL)
+=======
+    if ((openFile = kernel->fileSystem->Open(name, 2)) == NULL)
+>>>>>>> assignmentThird
     {
         printf("Print: unable to open file %s\n", name);
         return;
@@ -156,8 +169,13 @@ void Print(char *name)
 
 void RunUserProg(void *filename)
 {
+<<<<<<< HEAD
     AddrSpace *space = new AddrSpace;
     ASSERT(space != (AddrSpace *)NULL);
+=======
+    AddrSpace *space = new AddrSpace();
+    //ASSERT(kernel->currentThread->space != (AddrSpace *)NULL);
+>>>>>>> assignmentThird
     if (space->Load((char *)filename))
     {                     // load the program into the space
         space->Execute(); // run the program
@@ -187,6 +205,11 @@ int main(int argc, char **argv)
     bool threadTestFlag = false;
     bool consoleTestFlag = false;
     bool networkTestFlag = false;
+
+    // inital quantum as TimerTicks
+    int quantum = TimerTicks;
+    List<char *> userProgContainer = List<char *>();
+
 #ifndef FILESYS_STUB
     char *copyUnixFileName = NULL;   // UNIX file to be copied into Nachos
     char *copyNachosFileName = NULL; // name of copied file in Nachos
@@ -211,10 +234,20 @@ int main(int argc, char **argv)
         {
             cout << copyright << "\n";
         }
+<<<<<<< HEAD
         else if (strcmp(argv[i], "-x") == 0)
         {
             ASSERT(i + 1 < argc);
             userProgName = argv[i + 1];
+=======
+
+        // Append user program name into user program container
+        else if (strcmp(argv[i], "-x") == 0)
+        {
+            ASSERT(i + 1 < argc);
+            //userProgName = argv[i + 1];
+            userProgContainer.Append(argv[i + 1]);
+>>>>>>> assignmentThird
             i++;
         }
         else if (strcmp(argv[i], "-K") == 0)
@@ -229,6 +262,17 @@ int main(int argc, char **argv)
         {
             networkTestFlag = TRUE;
         }
+<<<<<<< HEAD
+=======
+        // -quantun setting quantum
+        else if (strcmp(argv[i], "-Q") == 0)
+        {
+            quantum = atoi(argv[i + 1]);
+            i++;
+            std::cout << "Seting quantum as " << quantum << std::endl;
+        }
+
+>>>>>>> assignmentThird
 #ifndef FILESYS_STUB
         else if (strcmp(argv[i], "-cp") == 0)
         {
@@ -276,7 +320,7 @@ int main(int argc, char **argv)
 
     kernel = new Kernel(argc, argv);
 
-    kernel->Initialize();
+    kernel->Initialize(quantum);
 
     CallOnUserAbort(Cleanup); // if user hits ctl-C
 
@@ -320,10 +364,27 @@ int main(int argc, char **argv)
 #endif // FILESYS_STUB
 
     // finally, run an initial user program if requested to do so
+<<<<<<< HEAD
     if (userProgName != NULL)
     {
         RunUserProg(userProgName);
+=======
+    // // old version
+    // userProgName = userProgContainer.RemoveFront();
+    // RunUserProg(userProgName);
+
+    // mult progs
+    while (!userProgContainer.IsEmpty())
+    {
+        userProgName = userProgContainer.RemoveFront();
+        Thread *thread = new Thread(userProgName);
+        thread->Fork((VoidFunctionPtr)RunUserProg, (void *)userProgName);
+        std::cout << "Create a thread for " << userProgName << std::endl;
+>>>>>>> assignmentThird
     }
+
+    // How to release userProgName memory leak??
+    //if(userProgName != NULL) delete userProgName;
 
     // NOTE: if the procedure "main" returns, then the program "nachos"
     // will exit (as any other normal program would).  But there may be

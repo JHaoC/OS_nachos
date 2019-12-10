@@ -191,7 +191,7 @@
 # of "-DSIM_FIX" to the DEFINES.  This should be enabled by default
 # and eventually will not require the symbol definition
 ################################################################
-DEFINES =  -DFILESYS_STUB -DRDATA -DSIM_FIX
+DEFINES = -DRDATA -DSIM_FIX #-DFILESYS_STUB -DUSE_TLB
 
 
 #####################################################################
@@ -276,16 +276,20 @@ THREAD_H = ../threads/alarm.h\
 	../threads/iorequest.h
 
 THREAD_C = ../threads/alarm.cc\
+    ../threads/synch.cc\
 	../threads/kernel.cc\
 	../threads/main.cc\
 	../threads/scheduler.cc\
-	../threads/synch.cc\
 	../threads/synchlist.cc\
 	../threads/thread.cc\
 	../threads/threadtest.cc\
 	../threads/iorequest.cc
 
+<<<<<<< HEAD
 THREAD_O = alarm.o kernel.o main.o scheduler.o synch.o thread.o iorequest.o threadtest.o 
+=======
+THREAD_O = alarm.o synch.o kernel.o main.o scheduler.o  thread.o threadtest.o
+>>>>>>> assignmentThird
 
 USERPROG_H = ../userprog/addrspace.h\
 	../userprog/syscall.h\
@@ -311,16 +315,18 @@ FILESYS_H =../filesys/directory.h \
 	../filesys/filesys.h \
 	../filesys/openfile.h\
 	../filesys/pbitmap.h\
-	../filesys/synchdisk.h
+	../filesys/synchdisk.h\
+	../filesys/filetable.h
 
 FILESYS_C =../filesys/directory.cc\
 	../filesys/filehdr.cc\
 	../filesys/filesys.cc\
 	../filesys/pbitmap.cc\
 	../filesys/openfile.cc\
-	../filesys/synchdisk.cc
+	../filesys/synchdisk.cc\
+	../filesys/filetable.cc
 
-FILESYS_O =directory.o filehdr.o filesys.o pbitmap.o openfile.o synchdisk.o
+FILESYS_O =directory.o filehdr.o filesys.o pbitmap.o openfile.o synchdisk.o filetable.o
 
 NETWORK_H = ../network/post.h
 

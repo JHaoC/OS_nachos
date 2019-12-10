@@ -66,6 +66,7 @@ Machine::Machine(bool debug)
     for (i = 0; i < TLBSize; i++)
 	tlb[i].valid = FALSE;
     pageTable = NULL;
+    tlbCounter = 0;
 #else	// use linear page table
     tlb = NULL;
     pageTable = NULL;
@@ -84,7 +85,7 @@ Machine::~Machine()
 {
     delete [] mainMemory;
     if (tlb != NULL)
-        delete [] tlb;
+        delete tlb;
 }
 
 //----------------------------------------------------------------------

@@ -19,6 +19,58 @@
 
 #define NumDirect 	((SectorSize - 2 * sizeof(int)) / sizeof(int))
 #define MaxFileSize 	(NumDirect * SectorSize)
+#define NumBlock (int) (SectorSize  / sizeof(int))
+
+class IndirectBlock {
+  public:
+    IndirectBlock();
+    int Allocate(PersistentBitmap *bitMap, int num_Sectors);// Initialize a IndirectBlock, 
+						//  including allocating space 
+						//  on disk for the file data
+    void Deallocate(PersistentBitmap *bitMap);  // De-allocate this file's 
+						//  data blocks
+
+    void FetchFrom(int sectorNumber); 	// Initialize file header from disk
+    void WriteBack(int sectorNumber); 	// Write modifications to file header
+					//  back to disk
+
+    int ByteToSector(int offset);	// Convert a byte offset into the file
+					// to the disk sector containing
+					// the byte
+
+    //void Print();			// Print the contents of the file.
+
+  private:
+    int dataSectors[NumBlock];		// Disk sector numbers for each data 
+					// block in the file
+  
+};
+
+class DoubleIndirectBlock {
+  public:
+    DoubleIndirectBlock();
+    int Allocate(PersistentBitmap *bitMap, int num_Sectors);// Initialize a DoubleIndirectBlock, 
+						//  including allocating space 
+						//  on disk for the file data
+    void Deallocate(PersistentBitmap *bitMap);  // De-allocate this file's 
+						//  data blocks
+
+    void FetchFrom(int sectorNumber); 	// Initialize file header from disk
+    void WriteBack(int sectorNumber); 	// Write modifications to file header
+					//  back to disk
+
+    int ByteToSector(int offset);	// Convert a byte offset into the file
+					// to the disk sector containing
+					// the byte
+
+    //void Print();			// Print the contents of the file.
+
+  private:
+    int dataSectors[NumBlock];		// Disk sector numbers for each data 
+					// block in the file
+  
+};
+
 
 // The following class defines the Nachos "file header" (in UNIX terms,  
 // the "i-node"), describing where on disk to find all of the data in the file.
@@ -35,8 +87,13 @@
 // by allocating blocks for the file (if it is a new file), or by
 // reading it from disk.
 
+
 class FileHeader {
   public:
+    FileHeader();
+    
+    FileHeader(int protection);
+
     bool Allocate(PersistentBitmap *bitMap, int fileSize);// Initialize a file header, 
 						//  including allocating space 
 						//  on disk for the file data
@@ -56,11 +113,21 @@ class FileHeader {
 
     void Print();			// Print the contents of the file.
 
+    // right depend on the three bit in Unix, direactly set as bool.
+    bool isReadable;
+    bool isWriteable;
+    bool isExcutable;
+    bool isRemoved;
+    //bool isDirectory; // Is a directory or file?
+
   private:
     int numBytes;			// Number of bytes in the file
     int numSectors;			// Number of data sectors in the file
     int dataSectors[NumDirect];		// Disk sector numbers for each data 
 					// block in the file
+  
 };
+
+
 
 #endif // FILEHDR_H

@@ -8,14 +8,15 @@
 #include "copyright.h"
 #include "debug.h"
 #include "main.h"
+#include "synch.h"
 #include "kernel.h"
 #include "sysdep.h"
-#include "synch.h"
 #include "synchlist.h"
 #include "libtest.h"
 #include "string.h"
 #include "synchconsole.h"
 #include "synchdisk.h"
+#include "filetable.h"
 #include "post.h"
 
 //----------------------------------------------------------------------
@@ -26,6 +27,10 @@
 
 Kernel::Kernel(int argc, char **argv)
 {
+<<<<<<< HEAD
+=======
+    quantum = TimerTicks;
+>>>>>>> assignmentThird
     randomSlice = FALSE;
     debugUserProg = FALSE;
     consoleIn = NULL;  // default is stdin
@@ -61,6 +66,7 @@ Kernel::Kernel(int argc, char **argv)
             ASSERT(i + 1 < argc);
             consoleOut = argv[i + 1];
             i++;
+<<<<<<< HEAD
 #ifndef FILESYS_STUB
         }
         else if (strcmp(argv[i], "-f") == 0)
@@ -68,6 +74,24 @@ Kernel::Kernel(int argc, char **argv)
             formatFlag = TRUE;
 #endif
         }
+=======
+        }
+
+        // -randomselect setting 
+        else if (strcmp(argv[i], "-Randomselected") == 0) {
+            randomselect = TRUE;
+            std::cout<< "Seting Random pop page if need"<< std::endl;
+        }
+
+#ifndef FILESYS_STUB
+        
+        else if (strcmp(argv[i], "-f") == 0)
+        {
+            formatFlag = TRUE;
+        }
+#endif
+        
+>>>>>>> assignmentThird
         else if (strcmp(argv[i], "-n") == 0)
         {
             ASSERT(i + 1 < argc); // next argument is float
@@ -100,11 +124,27 @@ Kernel::Kernel(int argc, char **argv)
 //	data via the "kernel" global variable.
 //----------------------------------------------------------------------
 
+<<<<<<< HEAD
 void Kernel::Initialize()
+=======
+void Kernel::Initialize(int quantum)
+>>>>>>> assignmentThird
 {
     // We didn't explicitly allocate the current thread we are running in.
     // But if it ever tries to give up the CPU, we better have a Thread
     // object to save its state.
+<<<<<<< HEAD
+=======
+
+    // set for quantum
+    this->quantum = quantum;
+
+    // Global file table setting up
+    globalFileTable = new FileEntryTable();
+    //globalFileTable->InsertEntry(NULL); // for ConsoleIn
+    //globalFileTable->InsertEntry(NULL); //for ConsoleOur
+
+>>>>>>> assignmentThird
     currentThread = new Thread("main");
     currentThread->setStatus(RUNNING);
 
@@ -115,11 +155,38 @@ void Kernel::Initialize()
     machine = new Machine(debugUserProg);
     synchConsoleIn = new SynchConsoleInput(consoleIn);    // input from stdin
     synchConsoleOut = new SynchConsoleOutput(consoleOut); // output to stdout
+<<<<<<< HEAD
     synchDisk = new SynchDisk();                          //
+=======
+    synchDisk = new SynchDisk();
+    io_lock = new Lock("atomic_io_lock");
+    directoryFile_lock = new Lock("directoryFile_lock");
+    freeMapFile_lock = new Lock("freeMapFile_lock");
+    threadTable = new Thread*[40]; // Max_thread can have for userprog
+    for(int i = 0; i < 40; i++)
+    {
+        threadTable[i] = NULL;
+    }
+    
+
+>>>>>>> assignmentThird
 #ifdef FILESYS_STUB
     fileSystem = new FileSystem();
+
+    // create a new file as swap
+    if (fileSystem->Create("swapspace"))
+    {
+        swapspace = fileSystem->Open("swapspace");
+    }
+
 #else
     fileSystem = new FileSystem(formatFlag);
+    // create a new file as swap
+    if((swapspace=fileSystem->Open("swapspace",2))==NULL)
+    {
+        fileSystem->Create("swapspace", 0, 6);
+        swapspace = fileSystem->Open("swapspace",2);
+    }
 #endif // FILESYS_STUB
 <<<<<<< HEAD
     // postOfficeIn = new PostOfficeInput(10);
@@ -128,6 +195,10 @@ void Kernel::Initialize()
     //postOfficeIn = new PostOfficeInput(10);
     //postOfficeOut = new PostOfficeOutput(reliability);
 >>>>>>> assignmentFirst
+
+    swapCounter = 0;
+    PageContainer = new List<TranslationEntry *>();
+    freeMap = new Bitmap(NumPhysPages);
 
     interrupt->Enable();
 }
@@ -150,7 +221,18 @@ Kernel::~Kernel()
     delete fileSystem;
     delete postOfficeIn;
     delete postOfficeOut;
+<<<<<<< HEAD
 
+=======
+    delete swapspace;
+    delete freeMap;
+    delete PageContainer;
+    delete io_lock;
+    delete directoryFile_lock;
+    delete freeMapFile_lock;
+    delete globalFileTable;
+    delete threadTable;
+>>>>>>> assignmentThird
     Exit(0);
 }
 
@@ -163,10 +245,17 @@ void Kernel::ThreadSelfTest()
 {
     Semaphore *semaphore;
     SynchList<int> *synchList;
+<<<<<<< HEAD
 
     LibSelfTest();             // test library routines
     currentThread->SelfTest(); // test thread switching
 
+=======
+
+    LibSelfTest();             // test library routines
+    currentThread->SelfTest(); // test thread switching
+
+>>>>>>> assignmentThird
     // test semaphore operation
     semaphore = new Semaphore("test", 0);
     semaphore->SelfTest();

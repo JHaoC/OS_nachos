@@ -33,7 +33,11 @@
 
 Scheduler::Scheduler()
 {
+<<<<<<< HEAD
     readyList = new RedBlackTree<Thread *>;
+=======
+    readyList = new List<Thread *>;
+>>>>>>> assignmentThird
     toBeDestroyed = NULL;
 }
 
@@ -92,11 +96,15 @@ Scheduler::FindNextToRun()
     }
     else
     {
+<<<<<<< HEAD
         // Set Time Interrupt
         int delay = 100000 / (readyList->GetNumofNodes());
         Thread *res = readyList->Delele()->item;
         res->UpdateRRtime(delay);
         return res;
+=======
+        return readyList->RemoveFront();
+>>>>>>> assignmentThird
     }
 }
 
@@ -120,7 +128,10 @@ Scheduler::FindNextToRun()
 void Scheduler::Run(Thread *nextThread, bool finishing)
 {
     Thread *oldThread = kernel->currentThread;
+<<<<<<< HEAD
     printf("Context Switch happen from %s to %s, the new thread will run on CPU %d.\n\n",oldThread->getName(),nextThread->getName(), nextThread->GetRRtime());
+=======
+>>>>>>> assignmentThird
 
     ASSERT(kernel->interrupt->getLevel() == IntOff);
 
@@ -142,6 +153,13 @@ void Scheduler::Run(Thread *nextThread, bool finishing)
     kernel->currentThread = nextThread; // switch to the next thread
     nextThread->setStatus(RUNNING);     // nextThread is now running
 
+<<<<<<< HEAD
+=======
+    // Set the pagetable for new thread
+
+    //kernel->currentThread->space->RestoreState();
+
+>>>>>>> assignmentThird
     DEBUG(dbgThread, "Switching from: " << oldThread->getName() << " to: " << nextThread->getName());
 
     // This is a machine-dependent assembly language routine defined
@@ -161,7 +179,11 @@ void Scheduler::Run(Thread *nextThread, bool finishing)
     CheckToBeDestroyed(); // check if thread we were running
                           // before this one has finished
                           // and needs to be cleaned up
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> assignmentThird
     if (oldThread->space != NULL)
     {                                  // if there is an address space
         oldThread->RestoreUserState(); // to restore, do it.
@@ -181,6 +203,29 @@ void Scheduler::CheckToBeDestroyed()
 {
     if (toBeDestroyed != NULL)
     {
+<<<<<<< HEAD
+=======
+        // reset bitmap of mainmemory
+        ListIterator<TranslationEntry*> *item = new ListIterator<TranslationEntry*>(kernel->PageContainer);
+        for (; !item->IsDone(); item->Next()) {
+            if (item->Item()->threadID == toBeDestroyed->threadID) {
+                kernel->freeMap->Clear(item->Item()->physicalPage); // clear corresponding bit
+            }
+        }
+
+        // // check  TLB no not
+        // for(int i = 0; i < TLBSize; i++)
+        // {
+        //     if(kernel->machine->tlb[i].threadID == toBeDestroyed->threadID)
+        //     {
+        //         kernel->machine->tlb[i].valid = FALSE;
+        //         kernel->machine->tlb[i].physicalPage = -1;
+        //         break;
+        //     }
+        // }
+
+        // space will delete by destructor of thread
+>>>>>>> assignmentThird
         delete toBeDestroyed;
         toBeDestroyed = NULL;
     }

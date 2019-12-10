@@ -2,7 +2,7 @@
 //	Global variables for the Nachos kernel.
 //
 // Copyright (c) 1992-1996 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
+// All rights reserved.  See copyright.h for copyright notice and limitation
 // of liability and disclaimer of warranty provisions.
 
 #ifndef KERNEL_H
@@ -18,61 +18,91 @@
 #include "alarm.h"
 #include "filesys.h"
 #include "machine.h"
+#include "bitmap.h"
+#include "synchconsole.h"
+#include "../filesys/filetable.h"
 
 class PostOfficeInput;
 class PostOfficeOutput;
 class SynchConsoleInput;
 class SynchConsoleOutput;
 class SynchDisk;
+class Lock;
+class Openfile;
 
-class Kernel {
-  public:
+class Kernel
+{
+public:
     Kernel(int argc, char **argv);
-    				// Interpret command line arguments
-    ~Kernel();		        // deallocate the kernel
-    
-    void Initialize(); 		// initialize the kernel -- separated
-				// from constructor because 
-				// refers to "kernel" as a global
+    // Interpret command line arguments
+    ~Kernel(); // deallocate the kernel
 
-    void ThreadSelfTest();	// self test of threads and synchronization
+    void Initialize(int quantum); // initialize the kernel -- separated
+        // from constructor because
+        // refers to "kernel" as a global
 
-    void ConsoleTest();         // interactive console self test
+    void ThreadSelfTest(); // self test of threads and synchronization
 
-    void NetworkTest();         // interactive 2-machine network test
-    
-// These are public for notational convenience; really, 
-// they're global variables used everywhere.
+    void ConsoleTest(); // interactive console self test
 
-    Thread *currentThread;	// the thread holding the CPU
-    Scheduler *scheduler;	// the ready list
-    Interrupt *interrupt;	// interrupt status
-    Statistics *stats;		// performance metrics
-    Alarm *alarm;		// the software alarm clock    
-    Machine *machine;           // the simulated CPU
+    void NetworkTest(); // interactive 2-machine network test
+
+    // These are public for notational convenience; really,
+    // they're global variables used everywhere.
+
+    Thread *currentThread; // the thread holding the CPU
+    Scheduler *scheduler;  // the ready list
+    Interrupt *interrupt;  // interrupt status
+    Statistics *stats;     // performance metrics
+    Alarm *alarm;          // the software alarm clock
+    Machine *machine;      // the simulated CPU
     SynchConsoleInput *synchConsoleIn;
     SynchConsoleOutput *synchConsoleOut;
     SynchDisk *synchDisk;
-    FileSystem *fileSystem;     
+    FileSystem *fileSystem;
     PostOfficeInput *postOfficeIn;
     PostOfficeOutput *postOfficeOut;
 
+<<<<<<< HEAD
     
 
     int hostName;               // machine identifier
+=======
+    // Assignment 2
+    int quantum; // design for quantum, default as TimeTicker
+    OpenFile *swapspace; // swap space to increase memory
+    int swapCounter;
+    List<TranslationEntry *> *PageContainer;
+    Bitmap *freeMap;
+    int numofThread = 0; // for TLB
+    int hostName; // machine identifier
+    bool randomselect = FALSE;
+>>>>>>> assignmentThird
 
-  private:
-    bool randomSlice;		// enable pseudo-random time slicing
-    bool debugUserProg;         // single step user program
-    double reliability;         // likelihood messages are dropped
-    char *consoleIn;            // file to read console input from
-    char *consoleOut;           // file to send console output to
+    // Assignment 3
 #ifndef FILESYS_STUB
-    bool formatFlag;          // format the disk if this is true
+    Lock *io_lock; // force i/o as atomic
+    Lock *directoryFile_lock; // lock for directoryFile in filesystem 
+    Lock *freeMapFile_lock; // lock for freeMapFile in filesytem
+
+    FileEntryTable *globalFileTable; // for kernel openfiletable
+    OpenFile *freeMapFile;   // Bit map of free disk blocks,
+							 // represented as a file
+	OpenFile *directoryFile; // "Root" directory -- list of
+
+    Thread** threadTable;
+#endif
+    
+
+private:
+    bool randomSlice;   // enable pseudo-random time slicing
+    bool debugUserProg; // single step user program
+    double reliability; // likelihood messages are dropped
+    char *consoleIn;    // file to read console input from
+    char *consoleOut;   // file to send console output to
+#ifndef FILESYS_STUB
+    bool formatFlag; // format the disk if this is true
 #endif
 };
 
-
 #endif // KERNEL_H
-
-

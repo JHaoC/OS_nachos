@@ -54,6 +54,7 @@ void ExceptionHandler(ExceptionType which)
 
 	DEBUG(dbgSys, "Received Exception " << which << " type: " << type << "\n");
 
+<<<<<<< HEAD
 	switch (which)
 	{
 	case SyscallException:
@@ -105,6 +106,457 @@ void ExceptionHandler(ExceptionType which)
 	default:
 		cerr << "Unexpected user mode exception" << (int)which << "\n";
 		break;
+=======
+	//std::cout<< "Type: "<< type<< std::endl;
+
+	if (which == SyscallException)
+	{
+
+		if (type == SC_Halt)
+		{
+			DEBUG(dbgSys, "Shutdown, initiated by user program.\n");
+
+			SysHalt();
+
+			ASSERTNOTREACHED();
+		}
+		else if (type == SC_Add)
+		{
+
+			DEBUG(dbgSys, "Add " << kernel->machine->ReadRegister(4) << " + " << kernel->machine->ReadRegister(5) << "\n");
+
+			/* Process SysAdd Systemcall*/
+			int result;
+			result = SysAdd(/* int op1 */ (int)kernel->machine->ReadRegister(4),
+							/* int op2 */ (int)kernel->machine->ReadRegister(5));
+
+			DEBUG(dbgSys, "Add returning with " << result << "\n");
+			/* Prepare Result */
+			kernel->machine->WriteRegister(2, (int)result);
+
+			/* Modify return point */
+			{
+				/* set previous programm counter (debugging only)*/
+				kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+
+				/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+				kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+
+				/* set next programm counter for brach execution */
+				kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			}
+
+			return;
+
+			ASSERTNOTREACHED();
+		}
+
+		/* Read systemcall*/
+		else if (type == SC_Read)
+		{
+			DEBUG(dbgSys, "Read from console to buffer" << kernel->machine->ReadRegister(4) << " total size is " << kernel->machine->ReadRegister(5) << "\n");
+
+			/* Process SysRead Systemcall*/
+			int result;
+			result = SysRead(/* int op1 */ (int)kernel->machine->ReadRegister(4),
+							/* int op2 */ (int)kernel->machine->ReadRegister(5),
+							(int)kernel->machine->ReadRegister(6));
+
+			DEBUG(dbgSys, "Read returning num of bytes actually read with " << result << "\n");
+			/* Prepare Result */
+			kernel->machine->WriteRegister(2, (int)result);
+
+			/* Modify return point */
+			{
+				/* set previous programm counter (debugging only)*/
+				kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+
+				/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+				kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+
+				/* set next programm counter for brach execution */
+				kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			}
+
+			return;
+
+			ASSERTNOTREACHED();
+
+		}
+		/* Create systemcall*/
+		else if (type == SC_Create)
+		{
+			/* code */
+			DEBUG(dbgSys, "Create empty file" << kernel->machine->ReadRegister(4) << "protection: " << kernel->machine->ReadRegister(5) << "\n");
+
+			/* Process SysCreate Systemcall*/
+			int result;
+			result = SysCreate(kernel->machine->ReadRegister(4), kernel->machine->ReadRegister(5));
+			DEBUG(dbgSys, "Success return 1 otherwise -1, the result: " << result << "\n");
+			/* Prepare Result */
+			kernel->machine->WriteRegister(2, (int)result);
+
+			/* Modify return point */
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+
+			return;
+
+			ASSERTNOTREACHED();
+		}
+
+		/* Remove systemcall*/
+		else if (type == SC_Remove)
+		{
+			int result;
+			result = SysRemove(kernel->machine->ReadRegister(4));
+			DEBUG(dbgSys, "Success return 1 otherwise -1, the result: " << result << "\n");
+			kernel->machine->WriteRegister(2, (int)result);
+
+			/* Modify return point */
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			return;
+			ASSERTNOTREACHED();
+		}
+
+		/* Open systemcall*/
+		else if (type == SC_Open)
+		{
+			int result;
+			result = (int)SysOpen(kernel->machine->ReadRegister(4), kernel->machine->ReadRegister(5));
+			DEBUG(dbgSys, "Success return openfileID otherwise -1, the result: " << result << "\n");
+			std::cout<< "Open result is "<< result <<std::endl;
+			kernel->machine->WriteRegister(2, (int)result);
+			/* Modify return point */
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			return;
+			ASSERTNOTREACHED();
+		}
+
+		/* Write systemcall*/
+		else if (type == SC_Write)
+		{
+			/* code */
+			DEBUG(dbgSys, "Write buffer into console" << kernel->machine->ReadRegister(4) << " total size is " << kernel->machine->ReadRegister(5) <<" on OpenFileID "<< kernel->machine->ReadRegister(6)<<"\n");
+
+			/* Process SysWrite Systemcall*/
+			int result;
+			result = SysWrite(kernel->machine->ReadRegister(4), kernel->machine->ReadRegister(5), kernel->machine->ReadRegister(6));
+			DEBUG(dbgSys, "Read returning num of bytes actually read with " << result << "\n");
+			/* Prepare Result */
+			kernel->machine->WriteRegister(2, (int)result);
+
+			/* Modify return point */
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+
+			return;
+
+			ASSERTNOTREACHED();
+		}
+
+		/* Seek systemcall*/
+		else if (type == SC_Seek)
+		{
+			int result;
+			result = SysSeek(kernel->machine->ReadRegister(4), kernel->machine->ReadRegister(5));
+			DEBUG(dbgSys, "Success return 1 otherwise -1, the result: " << result << "\n");
+			kernel->machine->WriteRegister(2, (int)result);
+			/* Modify return point */
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			return;
+			ASSERTNOTREACHED();
+		}
+
+		/* Open systemcall*/
+		else if (type == SC_Close)
+		{
+			int result;
+			result = SysClose(kernel->machine->ReadRegister(4));
+			DEBUG(dbgSys, "Success return 1 otherwise -1, the result: " << result << "\n");
+			kernel->machine->WriteRegister(2, (int)result);
+			/* Modify return point */
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			return;
+			ASSERTNOTREACHED();
+		}
+
+		/* Fork systemcall*/
+		else if (type == SC_ThreadFork)
+		{
+			/* code */
+			DEBUG(dbgSys, "Fork" << kernel->machine->ReadRegister(4) << "\n");
+
+			/* Process SysAdd Systemcall*/
+			int result;
+			result = SysFork(kernel->machine->ReadRegister(4));
+			DEBUG(dbgSys, "returning threadID if success otherwise -1 " << result << "\n");
+			/* Prepare Result */
+			kernel->machine->WriteRegister(2, (int)result);
+
+			/* Modify return point */
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+
+			return;
+
+			ASSERTNOTREACHED();
+		}
+
+		/* Exit systemcall*/
+		else if (type == SC_Exit)
+		{
+			/* code */
+			DEBUG(dbgSys, "Exit" << kernel->machine->ReadRegister(4) << "\n");
+
+			/* Process SysAdd Systemcall*/
+			int statue = kernel->machine->ReadRegister(4);
+			SysExit(statue);
+			DEBUG(dbgSys, "Exit thread\n");
+			/* Modify return point */
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+
+			return;
+
+			ASSERTNOTREACHED();
+		}
+
+		/* Exev systemcall*/
+		else if (type == SC_Exec)
+		{
+			/* code */
+			DEBUG(dbgSys, "Exec" << kernel->machine->ReadRegister(4) << "\n");
+
+			/* Process Sysexev Systemcall*/
+			SpaceId res = SysExec(kernel->machine->ReadRegister(4));
+			DEBUG(dbgSys, "Exec" << res<< "\n");
+			/* Modify return point */
+			kernel->machine->WriteRegister(2, (int)res);
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+
+			return;
+
+			ASSERTNOTREACHED();
+		}
+
+		/* Join systemcall*/
+		else if (type == SC_Join)
+		{
+			/* code */
+			DEBUG(dbgSys, "Join" << kernel->machine->ReadRegister(4) << "\n");
+
+			/* Process Sysexev Systemcall*/
+			int res = SysJoin(kernel->machine->ReadRegister(4));
+			DEBUG(dbgSys, "Join" << res<< "\n");
+			/* Modify return point */
+			kernel->machine->WriteRegister(2, (int)res);
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+
+			return;
+
+			ASSERTNOTREACHED();
+		}
+
+		else
+		{
+			cerr << "Unexpected system call " << type << "\n";
+		}
+	}
+	// else if(which == TLBMissException)
+	// {
+	// 	// increase TLB miss counter
+	// 	kernel->stats->numTLBMiss++;
+
+	// 	std::cout << "TLB MissException by "<< kernel->currentThread->getName()<<" " << kernel->currentThread->threadID <<std::endl;
+	// 	int virAdd = kernel->machine->ReadRegister(BadVAddrReg);
+	// 	// Get VPN
+	// 	unsigned int vpn = (unsigned)virAdd/PageSize;
+
+	// 	// if in the page table update TLB
+	// 	if (kernel->machine->pageTable[vpn].valid)
+	// 	{
+	// 		kernel->machine->tlb[kernel->machine->tlbCounter].virtualPage = vpn;
+	// 		kernel->machine->tlb[kernel->machine->tlbCounter].physicalPage = kernel->machine->pageTable[vpn].physicalPage;
+	// 		kernel->machine->tlb[kernel->machine->tlbCounter].valid = kernel->machine->pageTable[vpn].valid;
+	// 		kernel->machine->tlb[kernel->machine->tlbCounter].readOnly = kernel->machine->pageTable[vpn].readOnly;
+	// 		kernel->machine->tlb[kernel->machine->tlbCounter].dirty = kernel->machine->pageTable[vpn].dirty;
+	// 		kernel->machine->tlb[kernel->machine->tlbCounter].threadID = kernel->machine->pageTable[vpn].threadID;
+	// 		kernel->machine->tlb[kernel->machine->tlbCounter].use = kernel->machine->pageTable[vpn].use;
+			
+
+	// 		std::cout << "Program on the mainMemory and Using "<< kernel->machine->tlbCounter <<" TLB" <<std::endl<<std::endl;
+			
+	// 		kernel->machine->tlbCounter++;
+	// 		if(kernel->machine->tlbCounter == TLBSize)
+	// 		{
+	// 			kernel->machine->tlbCounter = 0;
+	// 		}
+	// 		return;
+	// 	}
+		
+	// 	//std::cout << "Program miss on the pagetable"<<std::endl;
+	// 	ExceptionHandler(PageFaultException);
+	// 	return;
+
+	// }
+	else if(which == PageFaultException)
+	{
+		// increase Pagefault miss counter
+		kernel->stats->numPageFaults++;
+
+		std::cout << "PageFaultException MissException by "<< kernel->currentThread->getName()<< " " << kernel->currentThread->threadID <<std::endl;
+		int pagetableIndex = kernel->freeMap->FindAndSet();
+		
+		if(pagetableIndex == -1)
+		{
+			// select a page depend on the page container
+			TranslationEntry* victimpage;
+			if(kernel->randomselect)
+			{
+				int index = rand() % kernel->PageContainer->NumInList();
+				ListIterator<TranslationEntry*>* item = new ListIterator<TranslationEntry*>(kernel->PageContainer);
+				for(int i = 0; i < index; i ++)
+				{
+					item->Next();
+				}
+				victimpage = item->Item();
+				kernel->PageContainer->Remove(victimpage);
+				delete item;
+			}
+			else
+			{
+				victimpage = kernel->PageContainer->RemoveFront();
+			}
+			pagetableIndex = victimpage->physicalPage;
+
+			// Chech write back swap if dirty 
+			if(victimpage->dirty)
+			{
+				// rewrite back swap and update victim page
+				std::cout << "Page "<< pagetableIndex << " is writed, need write back to swap space"<<std::endl;
+
+            	kernel->swapspace->WriteAt(&(kernel->machine->mainMemory[victimpage->physicalPage * PageSize]), PageSize, victimpage->virtualPage * PageSize);
+				victimpage->dirty = FALSE;
+				
+			}
+
+			// modify the page
+			victimpage->valid = FALSE;
+			victimpage->physicalPage = -1;
+
+			// // check victimpage is in TLB no not
+			// for(int i = 0; i < TLBSize; i++)
+			// {
+			// 	if(kernel->machine->tlb[i].virtualPage == pagetableIndex && kernel->machine->tlb[i].threadID == victimpage->threadID)
+			// 	{
+			// 		kernel->machine->tlb[i].valid = FALSE;
+			// 		kernel->machine->tlb[i].physicalPage = -1;
+			// 		break;
+			// 	}
+			// }
+			
+		}
+		
+		// Set new page and load page into mainmemory
+		// Get current user program virtual address
+		int virAdd = kernel->machine->ReadRegister(BadVAddrReg);
+		// Get VPN
+		unsigned int vpn = (unsigned)virAdd/PageSize;
+
+		// Set pageTable 
+		kernel->machine->pageTable[vpn].physicalPage = pagetableIndex;
+		kernel->machine->pageTable[vpn].valid = TRUE;
+
+		// update page container
+		if(kernel->PageContainer->IsInList(&(kernel->machine->pageTable[vpn])))
+		{
+			kernel->PageContainer->Remove(&(kernel->machine->pageTable[vpn]));
+		}
+		kernel->PageContainer->Append(&(kernel->machine->pageTable[vpn]));
+
+		// // update TLB
+		// kernel->machine->tlb[kernel->machine->tlbCounter].virtualPage = vpn;
+		// kernel->machine->tlb[kernel->machine->tlbCounter].physicalPage = kernel->machine->pageTable[vpn].physicalPage;
+		// kernel->machine->tlb[kernel->machine->tlbCounter].valid = kernel->machine->pageTable[vpn].valid;
+		// kernel->machine->tlb[kernel->machine->tlbCounter].readOnly = kernel->machine->pageTable[vpn].readOnly;
+		// kernel->machine->tlb[kernel->machine->tlbCounter].dirty = kernel->machine->pageTable[vpn].dirty;
+		// kernel->machine->tlb[kernel->machine->tlbCounter].threadID = kernel->machine->pageTable[vpn].threadID;
+		// kernel->machine->tlb[kernel->machine->tlbCounter].use = kernel->machine->pageTable[vpn].use;
+		
+		// //std::cout << "write into TLB on "<< kernel->machine->tlbCounter <<std::endl << std::endl;
+
+		// kernel->machine->tlbCounter++;
+		// if(kernel->machine->tlbCounter == TLBSize)
+		// {
+		// 	kernel->machine->tlbCounter = 0;
+		// }
+
+
+		// clear the mainMemory which are before write
+		//bzero(kernel->machine->mainMemory+(kernel->machine->pageTable[vpn].physicalPage * PageSize), PageSize);
+		// Load code into memory
+		kernel->swapspace->ReadAt(
+				&(kernel->machine->mainMemory[kernel->machine->pageTable[vpn].physicalPage * PageSize]),
+				PageSize, kernel->machine->pageTable[vpn].virtualPage * PageSize);
+		
+		std::cout << "Switch page "<< pagetableIndex<< std::endl;
+		return;
+		
+
+	}
+	
+	else
+	{
+		/* code */
+		cerr << "Unexpected user mode exception" << (int)which << "\n";
+>>>>>>> assignmentThird
 	}
 	ASSERTNOTREACHED();
 }
